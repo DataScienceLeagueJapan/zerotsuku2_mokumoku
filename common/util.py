@@ -15,7 +15,6 @@ def clip_grads(grads, max_norm):
             grad *= rate
 
 
-# 2.3.1 Prepossessing by Python
 def preprocess(text):
     text = text.lower()
     text = text.replace('.', ' .') # split comma as a word
@@ -217,3 +216,4 @@ def normalize(x):
         s = np.sqrt((x * x).sum())
         x /= s
     return x
+

@@ -1,5 +1,6 @@
-from sys import path
-path.append('/Users/yudaikawano/Library/Mobile Documents/com~apple~CloudDocs/dev/zerotsuku2_mokumoku/')
+import sys
+import os
+sys.path.append((os.getcwd()))
 
 import numpy as np
 import matplotlib.pyplot as plt

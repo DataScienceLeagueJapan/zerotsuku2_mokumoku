@@ -1,6 +1,6 @@
 from sys import path
-from pathlib import Path
-path.append('/Users/yudaikawano/Library/Mobile Documents/com~apple~CloudDocs/dev/zerotsuku2_mokumoku/')
+import os
+path.append(os.getcwd()) # /Users/yudaikawano/Library/Mobile Documents/com~apple~CloudDocs/dev/zerotsuku2_mokumoku から実行すること
 
 import numpy as np
 import matplotlib.pyplot as plt
