@@ -44,5 +44,3 @@ upstream https://github.com/DataScienceLeagueJapan/zerotsuku2_mokumoku.git (push
 - GitHubの設定を行う
 - 本を進める
 - GitHubにpushしてpull requestを出す
-
-
