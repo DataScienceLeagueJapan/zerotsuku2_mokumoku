@@ -36,7 +36,7 @@ class SimpleCBOW():
         loss = self.loss_layer(score, target)
         return loss
 
-    def backward(self, dout=1):
+    def backward(self,  dout=1):
         ds = self.loss_layer.backward(dout)
         da = self.out_layer.backward(ds)
         da *= 0.5
