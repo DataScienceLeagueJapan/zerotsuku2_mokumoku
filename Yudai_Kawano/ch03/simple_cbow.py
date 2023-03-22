@@ -10,8 +10,8 @@ class SimpleCBOW():
     def __init__(self, vocab_size, hidden_size) -> None:
         V = vocab_size; H = hidden_size
 
-        W_in  = 0.01 * randn(V, H)
-        W_out = 0.01 * randn(V, H)
+        W_in  = 0.01 * randn(V, H).astype('f')
+        W_out = 0.01 * randn(H, V).astype('f')
 
         self.in_layer0  = MatMul(W_in)
         self.in_layer1  = MatMul(W_in)
@@ -32,8 +32,9 @@ class SimpleCBOW():
         h1 = self.in_layer1.forward(contexts[:, 1])
 
         h = (h0 + h1) / 2
+
         score = self.out_layer.forward(h)
-        loss = self.loss_layer(score, target)
+        loss = self.loss_layer.forward(score, target)
         return loss
 
     def backward(self,  dout=1):
