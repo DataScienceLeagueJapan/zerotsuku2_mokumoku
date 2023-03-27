@@ -20,7 +20,6 @@ out_layer = MatMul(W_out)
 h0 = in_layer0.forward(c0)
 h1 = in_layer1.forward(c1)
 h = (h0 + h1) / 2
-
 s = out_layer.forward(h)
 print(s)
 
