@@ -2,7 +2,7 @@ import numpy
 import time
 import matplotlib.pyplot as plt
 import numpy as np
-from common.util import clip_grads
+from Yudai_Kawano.common.util import clip_grads
 
 
 class Trainer:
