@@ -4,7 +4,7 @@ sys.path.append(os.getcwd())
 import numpy as np
 import collections
 
-from Yudai_Kawano.common.layers import Embedding
+from Yudai_Kawano.common.layers import Embedding, SigmoidWithLoss
 
 
 
@@ -15,7 +15,7 @@ class EmbeddingDot():
         self.grads  = self.embed.grads
         self.cache  = None
 
-    def farward(self, h, idx):
+    def forward(self, h, idx):
         target_W = self.embed.forward(idx)
         out = np.sum(target_W * h, axis=1)
         self.cache = (h, target_W)
@@ -54,7 +54,6 @@ class UnigramSampler:
 
     def get_negative_sample(self, target):
         batch_size = target.shape[0]
-
         # this code doesn't apply CuPy because I don't have Nvidia GPU
         negative_sample = np.zeros((batch_size, self.sample_size), dtype=np.int32)
 
@@ -71,3 +70,40 @@ class UnigramSampler:
 
         return negative_sample
 
+
+class NegativeSamplingLoss():
+    def __init__(self, W, corpus, power=0.75, sample_size=5):
+        self.sample_size = sample_size
+        self.sampler = UnigramSampler(corpus, power, sample_size)
+        self.loss_layers = [SigmoidWithLoss() for _ in range(sample_size+1)]
+        self.embed_dot_layers = [EmbeddingDot(W) for _ in range(sample_size+1)]
+
+        self.params = []; self.grads = []
+        for layer in self.embed_dot_layers:
+            self.params += layer.params
+            self.grads  += layer.grads
+
+    def forward(self, h, target):
+        batch_size = target.shape[0]
+        negative_sample = self.sampler.get_negative_sample(target)
+
+        # 正例
+        score = self.embed_dot_layers[0].forward(h, target)
+        correct_label = np.ones(batch_size, dtype=np.int32)
+        loss  = self.loss_layers[0].forward(score, correct_label)
+
+        # 負例
+        negative_label = np.zeros(batch_size, dtype=np.int32)
+        for i in range(self.sample_size):
+            negative_target = negative_sample[:, i]
+            score = self.embed_dot_layers[i+1].forward(h, negative_target)
+            loss += self.loss_layers[i+1].forward(score, negative_label)
+
+        return loss
+
+    def backward(self, dout=1):
+        dh = 0
+        for l0, l1 in zip(self.loss_layers, self.embed_dot_layers):
+            dscore = l0.backward(dout)
+            dh    += l1.backward(dscore)
+        return dh
